@@ -1,0 +1,33 @@
+<!doctype html><html lang="en"><head><title>CareerNest · Log in</title><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/style.css"></head><body>
+<div id="nav"></div>
+<main class="page wrap"><div class="auth">
+  <div class="eyebrow">Welcome</div><h1 style="font-size:52px">Log in or join</h1>
+  <div class="tabs" style="margin-top:24px"><button id="t-login" class="on">Log in</button><button id="t-reg">Create account</button></div>
+  <form class="panel" id="form">
+    <div id="regOnly" hidden>
+      <label for="name">Full name</label><input id="name" autocomplete="name">
+      <label for="role">I am a</label>
+      <select id="role"><option value="applicant">Applicant looking for jobs</option><option value="recruiter">Recruiter posting jobs</option></select>
+    </div>
+    <label for="email">Email</label><input id="email" type="email" required autocomplete="email">
+    <label for="password">Password</label><input id="password" type="password" required minlength="6" autocomplete="current-password">
+    <div id="msg"></div>
+    <button class="btn full" id="go" style="margin-top:12px">Log in</button>
+  </form></div></main>
+<script src="/app.js"></script>
+<script>
+let mode='login';
+function setMode(m){mode=m;$('#regOnly').hidden=m==='login';$('#go').textContent=m==='login'?'Log in':'Create account';
+  $('#t-login').classList.toggle('on',m==='login');$('#t-reg').classList.toggle('on',m==='register');$('#msg').innerHTML='';}
+$('#t-login').onclick=()=>setMode('login');$('#t-reg').onclick=()=>setMode('register');
+$('#form').addEventListener('submit',async e=>{
+  e.preventDefault();
+  try{
+    const body={email:$('#email').value,password:$('#password').value};
+    if(mode==='register'){body.name=$('#name').value;body.role=$('#role').value;}
+    const d=await api('/auth/'+mode,{method:'POST',body});
+    localStorage.setItem('token',d.token);localStorage.setItem('user',JSON.stringify(d.user));
+    location.href=d.user.role==='recruiter'?'/recruiter.html':'/';
+  }catch(err){flash($('#msg'),err.message)}
+});
+</script></body></html>

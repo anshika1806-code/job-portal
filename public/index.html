@@ -1,0 +1,29 @@
+<!doctype html><html lang="en"><head><title>CareerNest · Open roles</title><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/style.css"></head><body>
+<div id="nav"></div>
+<main class="page wrap">
+  <div class="eyebrow">Open roles</div>
+  <h1>Find your next opportunity</h1>
+  <form class="search" id="search">
+    <input name="q" placeholder="Title, skill, or company" aria-label="Search">
+    <input name="location" placeholder="Location" aria-label="Location">
+    <select name="type" aria-label="Job type"><option value="">Any type</option><option>Full-time</option><option>Part-time</option><option>Contract</option><option>Internship</option><option>Remote</option></select>
+    <button class="btn">Search</button>
+  </form>
+  <div class="joblist" id="jobs"></div>
+</main>
+<script src="/app.js"></script>
+<script>
+async function load(){
+  const qs = new URLSearchParams(new FormData(document.querySelector('#search')));
+  [...qs.keys()].forEach(k => !qs.get(k) && qs.delete(k));
+  const jobs = await api('/jobs?' + qs);
+  $('#jobs').innerHTML = jobs.length ? jobs.map(j => `
+    <a class="job" href="/job.html?id=${j._id}">${logo(j)}
+      <div><h3>${esc(j.title)}</h3>${j.viewed ? '<span class="badge">Viewed</span>' : ''}
+      <div class="company">${esc(j.company)} · ${esc(j.location)}</div>
+      <div class="meta">${ago(j.createdAt)} · ${esc(j.type)}</div></div></a>`).join('')
+    : '<p class="empty">No roles match your search. Try a different keyword or clear the filters.</p>';
+}
+$('#search').addEventListener('submit', e => { e.preventDefault(); load(); });
+load();
+</script></body></html>

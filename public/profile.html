@@ -1,0 +1,32 @@
+<!doctype html><html lang="en"><head><title>CareerNest · Profile</title><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/style.css"></head><body>
+<div id="nav"></div>
+<main class="page wrap" style="max-width:820px">
+  <div class="profile-top"><div><div class="eyebrow">Your account</div><h1>Profile</h1></div><div id="big"></div></div>
+  <p class="lead" style="margin-bottom:28px">Keep your details current to get the most from CareerNest.</p>
+  <form class="panel" id="form">
+    <h2 style="font-size:30px">Personal details</h2>
+    <label for="name">Name</label><input id="name" required>
+    <label for="email">Email</label><input id="email" type="email" required>
+    <label for="image">Profile image <small>optional · max 2 MB</small></label><input id="image" type="file" accept="image/*">
+    <div id="msg"></div>
+    <button class="btn full" style="margin-top:16px">Save profile</button>
+  </form>
+</main>
+<script src="/app.js"></script>
+<script>
+if(guard()){
+  const show=u=>{$('#big').innerHTML=avatar(u,'lg');$('#name').value=u.name;$('#email').value=u.email;};
+  show(me());
+  api('/me').then(u=>{localStorage.setItem('user',JSON.stringify(u));show(u);renderNav();});
+  $('#form').addEventListener('submit',async e=>{
+    e.preventDefault();
+    const fd=new FormData();fd.append('name',$('#name').value);fd.append('email',$('#email').value);
+    const f=$('#image').files[0];
+    if(f&&f.size>2*1024*1024)return flash($('#msg'),'Image must be 2 MB or smaller');
+    if(f)fd.append('image',f);
+    try{const u=await api('/me',{method:'PUT',body:fd});
+      localStorage.setItem('user',JSON.stringify(u));show(u);renderNav();flash($('#msg'),'Profile saved',true);
+    }catch(err){flash($('#msg'),err.message)}
+  });
+}
+</script></body></html>

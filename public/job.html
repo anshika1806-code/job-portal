@@ -1,0 +1,44 @@
+<!doctype html><html lang="en"><head><title>CareerNest · Job</title><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/style.css"></head><body>
+<div id="nav"></div>
+<main class="page wrap"><a href="/">← All jobs</a><div id="view"></div></main>
+<script src="/app.js"></script>
+<script>
+const id=new URLSearchParams(location.search).get('id');
+const money=n=>n?Number(n).toLocaleString('en-IN'):'';
+function applyBox(j){
+  const u=me();
+  let body;
+  if(!u) body='<a class="btn full" href="/login.html">Log in to apply</a>';
+  else if(u.role==='recruiter') body='<p class="meta">You are logged in as a recruiter. Applicants apply from their own accounts.</p>';
+  else if(j.applied) body='<div class="msg ok">You have applied to this job.</div>';
+  else body=`<button class="btn full" id="open">Apply now</button>
+    <form id="apply" hidden><hr style="border:0;border-top:1px solid var(--line);margin:20px 0 0">
+      <label for="cl">Cover letter <small>optional</small></label><textarea id="cl"></textarea>
+      <label for="cv">Résumé <small>PDF, DOC, or DOCX · 5 MB max</small></label><input id="cv" type="file" accept=".pdf,.doc,.docx" required>
+      <div id="msg"></div><button class="btn full" style="margin-top:16px">Submit application</button></form>`;
+  return `<aside class="tintbox"><div class="eyebrow">Interested?</div><h2 style="font-size:30px;margin:14px 0">Make your move.</h2>
+    <p>Apply directly and keep track of your application from your workspace.</p>${body}</aside>`;
+}
+(async()=>{
+  try{
+    const j=await api('/jobs/'+id);
+    document.title='CareerNest · '+j.title;
+    $('#view').innerHTML=`<div class="detail"><div>
+      <div class="head">${logo(j)}<div><div class="eyebrow">${esc(j.type)}</div><h1>${esc(j.title)}</h1>
+        <div class="meta">${esc(j.company)} · ${esc(j.location)} · Posted ${ago(j.createdAt)}${j.minSalary?' · ₹'+money(j.minSalary)+(j.maxSalary?' – ₹'+money(j.maxSalary):''):''}</div></div></div>
+      <section><h2>About the role</h2><p>${esc(j.description).replace(/\n/g,'<br>')}</p>
+        <div class="chips">${j.skills.map(s=>'<span class="chip">'+esc(s)+'</span>').join('')}</div></section>
+      <section><h2>About ${esc(j.company)}</h2><p>${esc(j.about)||'Company information will be shared by the recruiter soon.'}</p></section>
+    </div>${applyBox(j)}</div>`;
+    const open=$('#open');
+    if(open) open.onclick=()=>{$('#apply').hidden=false;open.hidden=true};
+    const f=$('#apply');
+    if(f) f.addEventListener('submit',async e=>{
+      e.preventDefault();
+      const fd=new FormData();fd.append('coverLetter',$('#cl').value);fd.append('resume',$('#cv').files[0]);
+      try{await api('/jobs/'+id+'/apply',{method:'POST',body:fd});f.outerHTML='<div class="msg ok">Application submitted. Good luck!</div>';}
+      catch(err){flash($('#msg'),err.message)}
+    });
+  }catch(err){$('#view').innerHTML='<p class="empty">'+esc(err.message)+'</p>'}
+})();
+</script></body></html>

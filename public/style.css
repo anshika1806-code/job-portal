@@ -1,0 +1,66 @@
+:root{--bg:#f7f5f0;--card:#fffefa;--tint:#e8eee8;--ink:#1e3a2c;--text:#4a5a50;--muted:#7a857d;--green:#224c3a;--clay:#9a5a3c;--line:#dcdcd3;--err:#a63a2b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 'DM Sans',system-ui,sans-serif}
+h1,h2,h3{font-family:'Playfair Display',Georgia,serif;color:var(--ink);line-height:1.1;margin:0}
+a{color:var(--clay);text-decoration:none}a:hover{text-decoration:underline}
+.wrap{max-width:1200px;margin:0 auto;padding:0 28px}
+.eyebrow{font:500 12px 'DM Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--clay)}
+/* nav */
+.nav{border-bottom:1px solid var(--line);background:var(--bg)}
+.nav .wrap{display:flex;align-items:center;gap:24px;height:68px}
+.brand{font:700 24px 'Playfair Display',serif;color:var(--ink)}.brand:hover{text-decoration:none}
+.nav .links{display:flex;gap:20px;flex:1}
+.nav .right{display:flex;align-items:center;gap:14px}
+.avatar{width:38px;height:38px;border-radius:50%;object-fit:cover;background:var(--tint);color:var(--ink);display:inline-grid;place-items:center;font-weight:700;font-size:14px;border:1px solid var(--line)}
+.avatar.lg{width:110px;height:110px;font-size:36px}
+/* buttons + forms */
+.btn{display:inline-block;background:var(--green);color:#fff;border:0;border-radius:6px;padding:13px 20px;font:600 15px 'DM Sans',sans-serif;cursor:pointer;text-align:center}
+.btn:hover{background:#1a3d2e;text-decoration:none}.btn.full{width:100%}.btn:disabled{opacity:.6}
+.btn.ghost{background:transparent;color:var(--green);border:1px solid var(--green)}
+.linkbtn{background:none;border:0;color:var(--clay);font:600 15px 'DM Sans';cursor:pointer;padding:0}
+.linkbtn.danger{color:var(--err)}
+label{display:block;font-weight:600;color:var(--ink);font-size:15px;margin:16px 0 6px}
+label small{font-weight:400;color:var(--muted)}
+input,select,textarea{width:100%;padding:14px 15px;border:1px solid var(--line);border-radius:6px;background:var(--card);font:15px 'DM Sans',sans-serif;color:#000}
+textarea{min-height:120px;resize:vertical}
+:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.msg{padding:11px 14px;border-radius:6px;margin:14px 0;font-size:14px}
+.msg.err{background:#f6e2de;color:var(--err)}.msg.ok{background:var(--tint);color:var(--green)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:32px}
+.tintbox{background:var(--tint);border:1px solid var(--line);border-radius:10px;padding:30px}
+/* pages */
+.page{padding:48px 0 80px}
+.page h1{font-size:clamp(40px,6vw,76px);margin:10px 0 18px}
+.lead{font-size:20px;color:var(--muted)}
+.search{display:grid;grid-template-columns:3fr 1.5fr 1.5fr auto;gap:12px;background:var(--tint);padding:16px;margin:28px 0}
+.joblist{display:grid;gap:16px}
+.job{display:flex;gap:20px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:30px;color:inherit}
+.job:hover{text-decoration:none;border-color:var(--green)}
+.logo{width:65px;height:65px;border-radius:6px;background:var(--tint);border:1px solid var(--line);display:grid;place-items:center;font-weight:700;color:var(--ink);flex:none;overflow:hidden}
+.logo img{width:100%;height:100%;object-fit:cover}
+.job h3{font:600 22px 'DM Sans';color:var(--green);display:inline}
+.badge{font:12px 'DM Mono',monospace;background:var(--tint);color:var(--ink);padding:2px 12px;border-radius:99px;margin-left:10px;vertical-align:middle}
+.meta{color:var(--muted);font-size:14px}.company{color:#111;font-size:18px}
+.chips{display:flex;gap:10px;flex-wrap:wrap;margin:24px 0}
+.chip{background:var(--tint);color:var(--ink);padding:6px 14px;border-radius:99px;font-size:14px}
+/* job detail */
+.detail{display:grid;grid-template-columns:1fr 380px;gap:70px;align-items:start}
+.detail .head{display:flex;gap:22px;margin:30px 0}
+.detail h1{font-size:clamp(36px,5vw,58px);margin:4px 0 8px}
+.detail section{border-top:1px solid var(--line);padding:32px 0}
+.detail h2{font-size:34px;margin-bottom:14px}
+/* recruiter dashboard: form left, jobs right */
+.dash{display:grid;grid-template-columns:1.6fr 1fr;gap:26px;align-items:start}
+.dash h2{font-size:30px;margin:8px 0 6px}
+.jrow{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:16px 0;border-top:1px solid var(--line)}
+.jrow b{color:var(--ink)}.jrow .acts{display:flex;gap:14px;flex:none}
+.applicant{display:flex;gap:12px;align-items:center;padding:14px 0;border-top:1px solid var(--line)}
+.applicant p{margin:6px 0 0;font-size:14px}
+.profile-top{display:flex;justify-content:space-between;align-items:flex-start;gap:20px}
+.auth{max-width:460px;margin:0 auto}
+.tabs{display:flex;gap:6px;margin-bottom:10px}.tabs button{flex:1;padding:11px;border:1px solid var(--line);background:var(--card);border-radius:6px;font:600 15px 'DM Sans';cursor:pointer;color:var(--text)}
+.tabs button.on{background:var(--green);color:#fff;border-color:var(--green)}
+.empty{color:var(--muted);padding:24px 0}
+@media(max-width:900px){.detail,.dash{grid-template-columns:1fr;gap:30px}.search{grid-template-columns:1fr}.row2{grid-template-columns:1fr}.job{padding:20px}}
+@media(prefers-reduced-motion:no-preference){.btn{transition:background .15s}.job{transition:border-color .15s}}

@@ -1,0 +1,55 @@
+<!doctype html><html lang="en"><head><title>CareerNest · Manage jobs</title><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/style.css"></head><body>
+<div id="nav"></div>
+<main class="page wrap"><div class="dash">
+  <form class="panel" id="form">
+    <div style="display:flex;justify-content:space-between"><div class="eyebrow">Job management</div><button type="button" class="linkbtn" id="cancel" hidden>Cancel edit</button></div>
+    <h2 id="ftitle">Post a new role</h2>
+    <div class="row2"><div><label for="title">Job title</label><input id="title" required></div>
+      <div><label for="company">Company name</label><input id="company" required></div></div>
+    <label for="logo">Company logo URL <small>optional</small></label><input id="logo" type="url">
+    <label for="about">About the company <small>shown on job detail page</small></label><textarea id="about"></textarea>
+    <div class="row2"><div><label for="location">Location</label><input id="location" required></div>
+      <div><label for="type">Employment type</label><select id="type"><option>Full-time</option><option>Part-time</option><option>Contract</option><option>Internship</option><option>Remote</option></select></div></div>
+    <label for="skills">Skills <small>comma-separated</small></label><input id="skills">
+    <div class="row2"><div><label for="minSalary">Minimum salary</label><input id="minSalary" type="number" min="0"></div>
+      <div><label for="maxSalary">Maximum salary</label><input id="maxSalary" type="number" min="0"></div></div>
+    <label for="description">Role description</label><textarea id="description" required></textarea>
+    <div id="msg"></div>
+    <button class="btn full" id="save" style="margin-top:16px">Publish job</button>
+  </form>
+  <aside class="panel"><div class="eyebrow">Applications</div><h2>Job submissions</h2>
+    <p class="meta" id="hint">Choose a role to see its applicants.</p>
+    <div id="list" style="margin-top:20px"></div><div id="apps"></div></aside>
+</div></main>
+<script src="/app.js"></script>
+<script>
+const F=['title','company','logo','about','location','type','skills','minSalary','maxSalary','description'];
+let editing=null,jobs=[];
+function reset(){editing=null;F.forEach(k=>$('#'+k).value=k==='type'?'Full-time':'');
+  $('#ftitle').textContent='Post a new role';$('#save').textContent='Publish job';$('#cancel').hidden=true;}
+async function refresh(){
+  jobs=await api('/my-jobs');
+  $('#list').innerHTML=jobs.length?jobs.map(j=>`<div class="jrow"><div><b>${esc(j.title)}</b><div class="meta">${esc(j.company)} · ${esc(j.location)} · ${j.applicants} applicant${j.applicants===1?'':'s'}</div></div>
+    <div class="acts"><button class="linkbtn" data-e="${j._id}">Edit</button><button class="linkbtn" data-s="${j._id}">Submissions</button><button class="linkbtn danger" data-d="${j._id}">Delete</button></div></div>`).join('')
+    :'<p class="empty">No jobs yet. Publish your first role using the form.</p>';
+}
+$('#list').addEventListener('click',async e=>{
+  const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.e){const j=jobs.find(x=>x._id===b.dataset.e);editing=j._id;
+    F.forEach(k=>$('#'+k).value=k==='skills'?j.skills.join(', '):(j[k]??''));
+    $('#ftitle').textContent='Edit job post';$('#save').textContent='Save changes';$('#cancel').hidden=false;scrollTo({top:0,behavior:'smooth'});}
+  if(b.dataset.d&&confirm('Delete this job and its applications?')){await api('/jobs/'+b.dataset.d,{method:'DELETE'});if(editing===b.dataset.d)reset();$('#apps').innerHTML='';refresh();}
+  if(b.dataset.s){const a=await api('/jobs/'+b.dataset.s+'/applications');const j=jobs.find(x=>x._id===b.dataset.s);
+    $('#apps').innerHTML='<h3 style="font-size:22px;margin:26px 0 6px">'+esc(j.title)+' applicants</h3>'+(a.length?a.map(x=>`<div class="applicant">${avatar(x.applicant)}<div><b>${esc(x.applicant.name)}</b><div class="meta">${esc(x.applicant.email)} · ${ago(x.createdAt)}</div>
+      ${x.coverLetter?'<p>'+esc(x.coverLetter)+'</p>':''}<a href="${esc(x.resume)}" target="_blank" rel="noopener">View résumé</a></div></div>`).join(''):'<p class="empty">No applications yet.</p>');}
+});
+$('#cancel').onclick=reset;
+$('#form').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const body={};F.forEach(k=>body[k]=$('#'+k).value);
+  try{await api(editing?'/jobs/'+editing:'/jobs',{method:editing?'PUT':'POST',body});
+    flash($('#msg'),editing?'Changes saved':'Job published',true);reset();refresh();
+  }catch(err){flash($('#msg'),err.message)}
+});
+if(guard('recruiter'))refresh();
+</script></body></html>
